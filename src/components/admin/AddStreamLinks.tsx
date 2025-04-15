@@ -269,7 +269,7 @@ const AddStreamLinks = () => {
               <SelectValue placeholder="Filter by match" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Matches</SelectItem>
+              <SelectItem value="all">All Matches</SelectItem>
               {liveMatches.map((match) => (
                 <SelectItem key={match.id} value={match.id.toString()}>
                   {match.awayTeam 
