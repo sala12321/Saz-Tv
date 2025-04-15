@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Hero from '../components/Hero';
 import SportsCategories from '../components/SportsCategories';
 import LiveMatches from '../components/LiveMatches';
-import UpcomingMatches from '../components/UpcomingMatches';
+import TomorrowMatches from '../components/TomorrowMatches';
 import PopularCompetitions from '../components/PopularCompetitions';
 import Footer from '../components/Footer';
 
@@ -16,7 +16,7 @@ const Index = () => {
         <Hero />
         <SportsCategories />
         <LiveMatches />
-        <UpcomingMatches />
+        <TomorrowMatches />
         <PopularCompetitions />
       </main>
       <Footer />

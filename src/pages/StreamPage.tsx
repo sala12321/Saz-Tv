@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, PlayCircle } from 'lucide-react';
+import { ArrowLeft, ExternalLink, PlayCircle, Globe2, Volume2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface StreamLink {
   id: number;
@@ -12,6 +13,8 @@ interface StreamLink {
   name: string;
   url: string;
   quality: string;
+  language?: string;
+  channel?: string;
 }
 
 interface Match {
@@ -105,21 +108,21 @@ const StreamPage = () => {
         <div className="bg-gray-900 rounded-lg p-6 mb-8">
           <div className="mb-4">
             <h1 className="text-2xl font-bold text-white mb-2">
-              {match.homeTeam}
-              {match.awayTeam && <span> vs {match.awayTeam}</span>}
+              {match?.homeTeam}
+              {match?.awayTeam && <span> vs {match.awayTeam}</span>}
             </h1>
-            <div className="text-gray-400">{match.competition}</div>
+            <div className="text-gray-400">{match?.competition}</div>
           </div>
           
           <div className="flex flex-wrap gap-6 mb-4">
-            {isLive && (
+            {match?.score && (
               <div className="flex items-center gap-2">
                 <span className="live-badge">LIVE</span>
                 <span className="text-white font-bold text-xl">{match.score}</span>
               </div>
             )}
             
-            {match.date && (
+            {match?.date && (
               <div className="text-gray-300">
                 {match.date} • {match.time}
               </div>
@@ -128,20 +131,21 @@ const StreamPage = () => {
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">Available Stream Links</h2>
+          <h2 className="text-xl font-bold text-white mb-4">Available Stream Sources</h2>
           
           {streamLinks.length === 0 ? (
             <div className="bg-gray-900 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-4">No stream links available for this match yet.</p>
-              {isLive && (
-                <p className="text-white">Please check back shortly. Stream links will be added soon.</p>
+              <p className="text-gray-400 mb-4">No stream sources available for this match yet.</p>
+              {match?.score && (
+                <p className="text-white">Please check back shortly. Stream sources will be added soon.</p>
               )}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Stream</TableHead>
+                  <TableHead>Channel</TableHead>
+                  <TableHead>Language</TableHead>
                   <TableHead>Quality</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
@@ -149,11 +153,24 @@ const StreamPage = () => {
               <TableBody>
                 {streamLinks.map((link) => (
                   <TableRow key={link.id}>
-                    <TableCell className="font-medium">{link.name}</TableCell>
                     <TableCell>
-                      <span className="px-2 py-1 bg-gray-800 rounded text-xs">
+                      <div className="flex items-center gap-2">
+                        <Globe2 size={16} className="text-gray-400" />
+                        <span className="font-medium">{link.channel || link.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Volume2 size={16} className="text-gray-400" />
+                        <Badge variant="secondary">
+                          {link.language || 'English'}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
                         {link.quality}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <a

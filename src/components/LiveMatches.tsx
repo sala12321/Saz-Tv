@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface Match {
   id: number;
@@ -12,6 +12,7 @@ interface Match {
   score: string;
   links: number;
   slug: string;
+  date?: string;
 }
 
 const defaultMatches = [
@@ -23,7 +24,8 @@ const defaultMatches = [
     time: 'Live - 32\'',
     score: '1-0',
     links: 4,
-    slug: 'bayern-vs-real-madrid'
+    slug: 'bayern-vs-real-madrid',
+    date: format(new Date(), 'yyyy-MM-dd')
   },
   {
     id: 2,
@@ -33,7 +35,8 @@ const defaultMatches = [
     time: 'Live - 55\'',
     score: '2-2',
     links: 3,
-    slug: 'liverpool-vs-manchester-city'
+    slug: 'liverpool-vs-manchester-city',
+    date: format(new Date(), 'yyyy-MM-dd')
   },
   {
     id: 3,
@@ -43,7 +46,8 @@ const defaultMatches = [
     time: 'Live - Q3',
     score: '62-58',
     links: 2,
-    slug: 'lakers-vs-celtics'
+    slug: 'lakers-vs-celtics',
+    date: format(new Date(), 'yyyy-MM-dd')
   },
   {
     id: 4,
@@ -53,7 +57,8 @@ const defaultMatches = [
     time: 'Live - 70\'',
     score: '0-1',
     links: 3,
-    slug: 'milan-vs-inter'
+    slug: 'milan-vs-inter',
+    date: format(new Date(), 'yyyy-MM-dd')
   },
   {
     id: 5,
@@ -63,32 +68,28 @@ const defaultMatches = [
     time: 'Live - 25\'',
     score: '0-0',
     links: 2,
-    slug: 'barcelona-vs-atletico'
+    slug: 'barcelona-vs-atletico',
+    date: format(new Date(), 'yyyy-MM-dd')
   },
 ];
 
 const LiveMatches = () => {
   const [matches, setMatches] = useState<Match[]>(defaultMatches);
-
+  
   useEffect(() => {
-    // Load matches from localStorage if available
     const savedMatches = localStorage.getItem('liveMatches');
     if (savedMatches) {
       const parsedMatches = JSON.parse(savedMatches);
+      const today = format(new Date(), 'yyyy-MM-dd');
       
-      // Add default match properties if missing
-      const processedMatches = parsedMatches.map((match: any) => ({
-        ...match,
-        time: match.time || `Live - ${Math.floor(Math.random() * 90)}'`,
-        score: match.score || '0-0',
-        links: match.links || 1
-      }));
+      const todayMatches = parsedMatches.filter((match: Match) => 
+        match.date === today
+      );
       
-      if (processedMatches.length > 0) {
-        setMatches(processedMatches);
+      if (todayMatches.length > 0) {
+        setMatches(todayMatches);
       }
     } else {
-      // If no saved matches, store the defaults
       localStorage.setItem('liveMatches', JSON.stringify(defaultMatches));
     }
   }, []);
