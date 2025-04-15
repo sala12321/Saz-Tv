@@ -1,9 +1,20 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 
-const matches = [
+interface Match {
+  id: number;
+  competition: string;
+  homeTeam: string;
+  awayTeam: string;
+  time: string;
+  score: string;
+  links: number;
+  slug: string;
+}
+
+const defaultMatches = [
   {
     id: 1,
     competition: 'UEFA Champions League',
@@ -57,6 +68,31 @@ const matches = [
 ];
 
 const LiveMatches = () => {
+  const [matches, setMatches] = useState<Match[]>(defaultMatches);
+
+  useEffect(() => {
+    // Load matches from localStorage if available
+    const savedMatches = localStorage.getItem('liveMatches');
+    if (savedMatches) {
+      const parsedMatches = JSON.parse(savedMatches);
+      
+      // Add default match properties if missing
+      const processedMatches = parsedMatches.map((match: any) => ({
+        ...match,
+        time: match.time || `Live - ${Math.floor(Math.random() * 90)}'`,
+        score: match.score || '0-0',
+        links: match.links || 1
+      }));
+      
+      if (processedMatches.length > 0) {
+        setMatches(processedMatches);
+      }
+    } else {
+      // If no saved matches, store the defaults
+      localStorage.setItem('liveMatches', JSON.stringify(defaultMatches));
+    }
+  }, []);
+
   return (
     <section className="py-10 bg-sports-dark-blue">
       <div className="container mx-auto px-4">

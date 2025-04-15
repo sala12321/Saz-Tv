@@ -1,9 +1,19 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const upcoming = [
+interface Match {
+  id: number;
+  competition: string;
+  homeTeam: string;
+  awayTeam: string;
+  date: string;
+  time: string;
+  slug: string;
+}
+
+const defaultUpcoming = [
   {
     id: 1,
     competition: 'UEFA Champions League',
@@ -43,6 +53,22 @@ const upcoming = [
 ];
 
 const UpcomingMatches = () => {
+  const [upcoming, setUpcoming] = useState<Match[]>(defaultUpcoming);
+
+  useEffect(() => {
+    // Load matches from localStorage if available
+    const savedMatches = localStorage.getItem('upcomingMatches');
+    if (savedMatches) {
+      const parsedMatches = JSON.parse(savedMatches);
+      if (parsedMatches.length > 0) {
+        setUpcoming(parsedMatches);
+      }
+    } else {
+      // If no saved matches, store the defaults
+      localStorage.setItem('upcomingMatches', JSON.stringify(defaultUpcoming));
+    }
+  }, []);
+
   return (
     <section className="py-10 bg-sports-dark">
       <div className="container mx-auto px-4">

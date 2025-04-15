@@ -56,3 +56,35 @@
     @apply w-2 h-2 rounded-full bg-white animate-pulse-light;
   }
 }
+
+/* Adding animation for pulse effect */
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-light {
+  animation: pulse-light 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Admin dashboard styles */
+.sports-dark {
+  background-color: #121826;
+}
+
+.sports-dark-blue {
+  background-color: #0f172a;
+}
+
+.sports-blue {
+  background-color: #2563eb;
+}
+
+.sports-red {
+  background-color: #ef4444;
+}
+
