@@ -13,6 +13,10 @@ import Donate from "./pages/Donate";
 import Schedule from "./pages/Schedule";
 import Channels from "./pages/Channels";
 import ChannelStream from "./pages/ChannelStream";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Disclaimer from "./pages/Disclaimer";
+import Dmca from "./pages/Dmca";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +35,10 @@ const App = () => (
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/channels" element={<Channels />} />
           <Route path="/channel/:slug" element={<ChannelStream />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/dmca" element={<Dmca />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
