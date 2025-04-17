@@ -45,8 +45,11 @@ type FormData = z.infer<typeof formSchema>;
 
 const AddStreamLinks = () => {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
+  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [streamLinks, setStreamLinks] = useState<StreamLink[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
+  const [matchType, setMatchType] = useState<'all' | 'live' | 'upcoming'>('all');
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -62,9 +65,12 @@ const AddStreamLinks = () => {
   useEffect(() => {
     // Load matches and links from localStorage
     const loadedLiveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]');
+    const loadedUpcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]');
     const loadedStreamLinks = JSON.parse(localStorage.getItem('streamLinks') || '[]');
     
     setLiveMatches(loadedLiveMatches);
+    setUpcomingMatches(loadedUpcomingMatches);
+    setAllMatches([...loadedLiveMatches, ...loadedUpcomingMatches]);
     setStreamLinks(loadedStreamLinks);
   }, []);
 
@@ -84,19 +90,6 @@ const AddStreamLinks = () => {
     setStreamLinks(updatedLinks);
     localStorage.setItem('streamLinks', JSON.stringify(updatedLinks));
     
-    // Update match links count
-    const updatedMatches = liveMatches.map(match => {
-      if (match.id === matchId) {
-        // Count links for this match
-        const linksCount = updatedLinks.filter(link => link.matchId === matchId).length;
-        return { ...match, links: linksCount };
-      }
-      return match;
-    });
-    
-    setLiveMatches(updatedMatches);
-    localStorage.setItem('liveMatches', JSON.stringify(updatedMatches));
-    
     // Reset form fields
     form.reset({
       matchId: data.matchId, // Keep the selected match
@@ -112,29 +105,10 @@ const AddStreamLinks = () => {
   };
 
   const handleDelete = (linkId: number) => {
-    // Get the link to be deleted to identify its match
-    const linkToDelete = streamLinks.find(link => link.id === linkId);
-    
-    if (!linkToDelete) return;
-    
     // Remove the link
     const updatedLinks = streamLinks.filter(link => link.id !== linkId);
     setStreamLinks(updatedLinks);
     localStorage.setItem('streamLinks', JSON.stringify(updatedLinks));
-    
-    // Update the match's link count
-    const matchId = linkToDelete.matchId;
-    const updatedMatches = liveMatches.map(match => {
-      if (match.id === matchId) {
-        // Count remaining links for this match
-        const linksCount = updatedLinks.filter(link => link.matchId === matchId).length;
-        return { ...match, links: linksCount };
-      }
-      return match;
-    });
-    
-    setLiveMatches(updatedMatches);
-    localStorage.setItem('liveMatches', JSON.stringify(updatedMatches));
     
     toast({
       title: "Stream Link Removed",
@@ -142,12 +116,24 @@ const AddStreamLinks = () => {
     });
   };
 
+  const handleFilterChange = (type: 'all' | 'live' | 'upcoming') => {
+    setMatchType(type);
+    setSelectedMatch(null);
+    form.setValue("matchId", "");
+  };
+
   const filteredLinks = selectedMatch 
     ? streamLinks.filter(link => link.matchId === selectedMatch)
     : streamLinks;
 
+  const filteredMatches = matchType === 'all' 
+    ? allMatches 
+    : matchType === 'live' 
+      ? liveMatches 
+      : upcomingMatches;
+
   const getMatchName = (matchId: number) => {
-    const match = liveMatches.find(m => m.id === matchId);
+    const match = allMatches.find(m => m.id === matchId);
     if (!match) return "Unknown Match";
     return match.awayTeam 
       ? `${match.homeTeam} vs ${match.awayTeam}`
@@ -157,6 +143,32 @@ const AddStreamLinks = () => {
   return (
     <div className="bg-gray-900 p-6 rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Add Stream Links</h2>
+      
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Button 
+            variant={matchType === 'all' ? 'default' : 'outline'}
+            onClick={() => handleFilterChange('all')}
+            size="sm"
+          >
+            All Matches
+          </Button>
+          <Button 
+            variant={matchType === 'live' ? 'default' : 'outline'}
+            onClick={() => handleFilterChange('live')}
+            size="sm"
+          >
+            Live Matches
+          </Button>
+          <Button 
+            variant={matchType === 'upcoming' ? 'default' : 'outline'}
+            onClick={() => handleFilterChange('upcoming')}
+            size="sm"
+          >
+            Upcoming Matches
+          </Button>
+        </div>
+      </div>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -180,7 +192,7 @@ const AddStreamLinks = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {liveMatches.map((match) => (
+                      {filteredMatches.map((match) => (
                         <SelectItem key={match.id} value={match.id.toString()}>
                           {match.awayTeam 
                             ? `${match.homeTeam} vs ${match.awayTeam}`
@@ -262,15 +274,15 @@ const AddStreamLinks = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium">Manage Stream Links</h3>
           <Select
-            onValueChange={(value) => setSelectedMatch(value ? parseInt(value) : null)}
-            value={selectedMatch?.toString() || ""}
+            onValueChange={(value) => setSelectedMatch(value === 'all' ? null : parseInt(value))}
+            value={selectedMatch?.toString() || "all"}
           >
             <SelectTrigger className="w-[250px]">
               <SelectValue placeholder="Filter by match" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Matches</SelectItem>
-              {liveMatches.map((match) => (
+              {allMatches.map((match) => (
                 <SelectItem key={match.id} value={match.id.toString()}>
                   {match.awayTeam 
                     ? `${match.homeTeam} vs ${match.awayTeam}`
