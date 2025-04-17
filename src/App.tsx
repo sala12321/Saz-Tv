@@ -9,6 +9,11 @@ import Admin from "./pages/Admin";
 import StreamPage from "./pages/StreamPage";
 import Live from "./pages/Live";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Donate from "./pages/Donate";
+import Schedule from "./pages/Schedule";
+import Channels from "./pages/Channels";
+import ChannelStream from "./pages/ChannelStream";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +28,11 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/stream/:slug" element={<StreamPage />} />
           <Route path="/live" element={<Live />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/channels" element={<Channels />} />
+          <Route path="/channel/:slug" element={<ChannelStream />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

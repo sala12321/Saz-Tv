@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
@@ -15,66 +16,8 @@ interface Match {
   date?: string;
 }
 
-const defaultMatches = [
-  {
-    id: 1,
-    competition: 'UEFA Champions League',
-    homeTeam: 'Bayern Munich',
-    awayTeam: 'Real Madrid',
-    time: 'Live - 32\'',
-    score: '1-0',
-    links: 4,
-    slug: 'bayern-vs-real-madrid',
-    date: format(new Date(), 'yyyy-MM-dd')
-  },
-  {
-    id: 2,
-    competition: 'Premier League',
-    homeTeam: 'Liverpool',
-    awayTeam: 'Manchester City',
-    time: 'Live - 55\'',
-    score: '2-2',
-    links: 3,
-    slug: 'liverpool-vs-manchester-city',
-    date: format(new Date(), 'yyyy-MM-dd')
-  },
-  {
-    id: 3,
-    competition: 'NBA',
-    homeTeam: 'LA Lakers',
-    awayTeam: 'Boston Celtics',
-    time: 'Live - Q3',
-    score: '62-58',
-    links: 2,
-    slug: 'lakers-vs-celtics',
-    date: format(new Date(), 'yyyy-MM-dd')
-  },
-  {
-    id: 4,
-    competition: 'Serie A',
-    homeTeam: 'AC Milan',
-    awayTeam: 'Inter Milan',
-    time: 'Live - 70\'',
-    score: '0-1',
-    links: 3,
-    slug: 'milan-vs-inter',
-    date: format(new Date(), 'yyyy-MM-dd')
-  },
-  {
-    id: 5,
-    competition: 'La Liga',
-    homeTeam: 'Barcelona',
-    awayTeam: 'Atletico Madrid',
-    time: 'Live - 25\'',
-    score: '0-0',
-    links: 2,
-    slug: 'barcelona-vs-atletico',
-    date: format(new Date(), 'yyyy-MM-dd')
-  },
-];
-
 const LiveMatches = () => {
-  const [matches, setMatches] = useState<Match[]>(defaultMatches);
+  const [matches, setMatches] = useState<Match[]>([]);
   
   useEffect(() => {
     const savedMatches = localStorage.getItem('liveMatches');
@@ -86,13 +29,27 @@ const LiveMatches = () => {
         match.date === today
       );
       
-      if (todayMatches.length > 0) {
-        setMatches(todayMatches);
-      }
-    } else {
-      localStorage.setItem('liveMatches', JSON.stringify(defaultMatches));
+      setMatches(todayMatches);
     }
   }, []);
+
+  if (matches.length === 0) {
+    return (
+      <section className="py-10 bg-sports-dark-blue">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Live Matches</h2>
+            <Link to="/live" className="text-sports-red hover:text-red-400 transition">View All</Link>
+          </div>
+          
+          <div className="bg-gray-900 rounded-lg p-8 text-center">
+            <p className="text-gray-400 text-lg">No live matches available at the moment.</p>
+            <p className="text-gray-500 mt-2">Please check back later or visit the admin dashboard to add matches.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 bg-sports-dark-blue">

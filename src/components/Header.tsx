@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
@@ -14,7 +14,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-white">Total<span className="text-sports-red">Sportek</span></span>
+            <span className="text-2xl font-bold text-white">Saz<span className="text-sports-red">Tv</span></span>
           </Link>
           
           {/* Desktop Navigation */}
@@ -23,16 +23,14 @@ const Header = () => {
             <Link to="/football" className="text-white hover:text-sports-red transition">Football</Link>
             <Link to="/basketball" className="text-white hover:text-sports-red transition">Basketball</Link>
             <Link to="/tennis" className="text-white hover:text-sports-red transition">Tennis</Link>
-            <Link to="/rugby" className="text-white hover:text-sports-red transition">Rugby</Link>
-            <Link to="/boxing" className="text-white hover:text-sports-red transition">Boxing</Link>
-            <Link to="/motorsports" className="text-white hover:text-sports-red transition">Motorsports</Link>
+            <Link to="/schedule" className="text-white hover:text-sports-red transition">Schedule</Link>
+            <Link to="/channels" className="text-white hover:text-sports-red transition">24/7 Channels</Link>
+            <Link to="/about" className="text-white hover:text-sports-red transition">About Us</Link>
+            <Link to="/donate" className="text-white hover:text-sports-red transition">Donate</Link>
           </nav>
           
-          {/* Search and Mobile Menu Toggle */}
+          {/* Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
-            <button className="text-white hover:text-sports-red transition">
-              <Search size={20} />
-            </button>
             <button 
               className="md:hidden text-white"
               onClick={toggleMenu}
@@ -51,9 +49,10 @@ const Header = () => {
             <li><Link to="/football" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Football</Link></li>
             <li><Link to="/basketball" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Basketball</Link></li>
             <li><Link to="/tennis" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Tennis</Link></li>
-            <li><Link to="/rugby" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Rugby</Link></li>
-            <li><Link to="/boxing" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Boxing</Link></li>
-            <li><Link to="/motorsports" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Motorsports</Link></li>
+            <li><Link to="/schedule" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Schedule</Link></li>
+            <li><Link to="/channels" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>24/7 Channels</Link></li>
+            <li><Link to="/about" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>About Us</Link></li>
+            <li><Link to="/donate" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Donate</Link></li>
           </ul>
         </nav>
       )}
