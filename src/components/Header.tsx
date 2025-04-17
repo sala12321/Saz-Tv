@@ -20,9 +20,7 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-6">
             <Link to="/" className="text-white hover:text-sports-red transition">Home</Link>
-            <Link to="/football" className="text-white hover:text-sports-red transition">Football</Link>
-            <Link to="/basketball" className="text-white hover:text-sports-red transition">Basketball</Link>
-            <Link to="/tennis" className="text-white hover:text-sports-red transition">Tennis</Link>
+            <Link to="/live" className="text-white hover:text-sports-red transition">Live</Link>
             <Link to="/schedule" className="text-white hover:text-sports-red transition">Schedule</Link>
             <Link to="/channels" className="text-white hover:text-sports-red transition">24/7 Channels</Link>
             <Link to="/about" className="text-white hover:text-sports-red transition">About Us</Link>
@@ -46,9 +44,7 @@ const Header = () => {
         <nav className="md:hidden bg-sports-dark-blue py-4 px-4 border-t border-gray-800">
           <ul className="flex flex-col gap-4">
             <li><Link to="/" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Home</Link></li>
-            <li><Link to="/football" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Football</Link></li>
-            <li><Link to="/basketball" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Basketball</Link></li>
-            <li><Link to="/tennis" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Tennis</Link></li>
+            <li><Link to="/live" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Live</Link></li>
             <li><Link to="/schedule" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Schedule</Link></li>
             <li><Link to="/channels" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>24/7 Channels</Link></li>
             <li><Link to="/about" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>About Us</Link></li>

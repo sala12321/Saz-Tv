@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -39,7 +38,10 @@ const Schedule = () => {
       setMatches(sortedMatches);
       
       // Extract unique competitions
-      const uniqueCompetitions = Array.from(new Set(sortedMatches.map((match: Match) => match.competition)));
+      const uniqueCompetitions = Array.from(
+        new Set(sortedMatches.map((match: Match) => match.competition))
+      ) as string[];
+      
       setCompetitions(uniqueCompetitions);
 
       // Group matches by date

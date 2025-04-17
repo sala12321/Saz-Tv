@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
-import LiveMatches from '../components/LiveMatches';
+import UpcomingMatches from '../components/UpcomingMatches';
 import TomorrowMatches from '../components/TomorrowMatches';
 import PopularCompetitions from '../components/PopularCompetitions';
 import Footer from '../components/Footer';
@@ -13,7 +13,7 @@ const Index = () => {
       <Header />
       <main className="flex-grow">
         <Hero />
-        <LiveMatches />
+        <UpcomingMatches />
         <TomorrowMatches />
         <PopularCompetitions />
       </main>

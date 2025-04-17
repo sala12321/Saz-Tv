@@ -25,6 +25,7 @@ const ChannelStream = () => {
   const { slug } = useParams<{ slug: string }>();
   const [channelName, setChannelName] = useState("");
   const [streamSources, setStreamSources] = useState<StreamSource[]>(defaultStreams);
+  const [selectedStream, setSelectedStream] = useState<string | null>(null);
   
   useEffect(() => {
     // Format the channel name from slug
@@ -39,7 +40,17 @@ const ChannelStream = () => {
     
     // In a real app, you would fetch stream sources for this channel
     // For now, we'll use the default streams
+    
+    // Check localStorage for any custom stream sources
+    const savedStreams = localStorage.getItem(`channel_${slug}_streams`);
+    if (savedStreams) {
+      setStreamSources(JSON.parse(savedStreams));
+    }
   }, [slug]);
+  
+  const handleStreamSelect = (url: string) => {
+    setSelectedStream(url);
+  };
   
   return (
     <div className="min-h-screen bg-sports-dark flex flex-col">
@@ -55,8 +66,19 @@ const ChannelStream = () => {
             </div>
             
             <div className="bg-gray-900 rounded-lg p-8 mb-8">
-              <div className="aspect-w-16 aspect-h-9 bg-black rounded mb-4 flex items-center justify-center">
-                <p className="text-gray-400">Stream preview available after selecting a source</p>
+              <div className="aspect-w-16 aspect-h-9 bg-black rounded mb-4">
+                {selectedStream ? (
+                  <iframe 
+                    src={selectedStream} 
+                    allowFullScreen
+                    className="w-full h-full"
+                    style={{ aspectRatio: '16/9' }}
+                  ></iframe>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <p className="text-gray-400">Stream preview available after selecting a source</p>
+                  </div>
+                )}
               </div>
               
               <div className="bg-gray-800 rounded-lg p-4 text-center mb-4">
@@ -90,15 +112,13 @@ const ChannelStream = () => {
                     <span>{source.language}</span>
                   </div>
                   <div className="text-sports-blue font-medium">{source.quality}</div>
-                  <a 
-                    href={source.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <button 
+                    onClick={() => handleStreamSelect(source.url)}
                     className="bg-sports-red hover:bg-red-700 text-white text-sm px-3 py-1 rounded flex items-center gap-1"
                   >
                     <span>Watch</span>
                     <ExternalLink size={12} />
-                  </a>
+                  </button>
                 </div>
               ))}
             </div>
