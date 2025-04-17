@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import StreamPage from "./pages/StreamPage";
-import Live from "./pages/Live";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Donate from "./pages/Donate";
@@ -27,7 +26,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/stream/:slug" element={<StreamPage />} />
-          <Route path="/live" element={<Live />} />
           <Route path="/about" element={<About />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/schedule" element={<Schedule />} />

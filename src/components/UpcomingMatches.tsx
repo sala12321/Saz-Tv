@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, Bell } from 'lucide-react';
+import { Calendar, Clock, Bell, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Match {
@@ -79,8 +79,9 @@ const UpcomingMatches = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {upcoming.map((event) => (
-            <div 
-              key={event.id} 
+            <Link 
+              key={event.id}
+              to={`/stream/${event.slug}`}
               className="bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition"
             >
               <div className="text-sm text-gray-400 mb-2">{event.competition}</div>
@@ -93,9 +94,9 @@ const UpcomingMatches = () => {
                   )}
                 </div>
                 
-                <button className="text-sports-blue hover:text-blue-400 transition">
-                  <Bell size={18} />
-                </button>
+                <div className="text-sports-blue">
+                  <ExternalLink size={18} />
+                </div>
               </div>
               
               <div className="flex flex-wrap gap-4 text-sm text-gray-300">
@@ -108,7 +109,7 @@ const UpcomingMatches = () => {
                   <span>{event.time}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
