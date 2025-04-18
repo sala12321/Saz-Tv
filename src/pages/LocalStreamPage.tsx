@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface StreamSource {
   id: number;
@@ -32,19 +32,16 @@ const LocalStreamPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Find the stream source by slug
     const sources = JSON.parse(localStorage.getItem('streamSources') || '[]') as StreamSource[];
     const source = sources.find(s => s.slug === slug);
     
     if (source) {
       setStreamSource(source);
       
-      // Find the match from all possible sources
       const liveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]') as Match[];
       const upcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]') as Match[];
       const allMatches = JSON.parse(localStorage.getItem('matches') || '[]') as Match[];
       
-      // Combine all match sources, but prefer using 'matches' if available
       const combinedMatches = allMatches.length > 0 ? allMatches : [...liveMatches, ...upcomingMatches];
       const matchData = combinedMatches.find(m => m.id === source.matchId);
       
@@ -56,22 +53,18 @@ const LocalStreamPage = () => {
     setIsLoading(false);
   }, [slug]);
 
-  // Function to safely render the iframe with proper styling
   const renderStream = () => {
     if (!streamSource) return null;
     
-    // Create a style to ensure iframe takes full width and height
-    const iframeStyle = {
-      width: '100%',
-      height: '100%',
-      border: 'none'
-    };
-    
-    // Use a sandbox div to contain the iframe for security
     return (
-      <div className="w-full h-full">
-        <div dangerouslySetInnerHTML={{ __html: streamSource.embedCode }} />
-      </div>
+      <AspectRatio ratio={16 / 9} className="overflow-hidden bg-black">
+        <div className="w-full h-full">
+          <div 
+            className="relative w-full h-full"
+            dangerouslySetInnerHTML={{ __html: streamSource.embedCode }} 
+          />
+        </div>
+      </AspectRatio>
     );
   };
 
@@ -104,9 +97,7 @@ const LocalStreamPage = () => {
             </div>
             
             <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-              <div className="aspect-video w-full">
-                {renderStream()}
-              </div>
+              {renderStream()}
             </div>
             
             <div className="bg-amber-900/30 border border-amber-700/50 text-amber-200 p-4 rounded-lg">
