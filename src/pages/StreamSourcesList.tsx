@@ -92,7 +92,7 @@ const StreamSourcesList = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {streamSources.map((source) => (
                     <Link
-                      to={`/stream/${source.slug}`}
+                      to={`/local-stream/${source.slug}`}
                       key={source.id}
                       className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg border border-gray-700 transition-colors flex items-center justify-between"
                     >
