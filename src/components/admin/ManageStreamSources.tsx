@@ -86,11 +86,18 @@ const ManageStreamSources = () => {
     // Create a slug from team names - used for URL
     const slug = `${match.homeTeam.toLowerCase().replace(/\s+/g, '-')}-vs-${match.awayTeam.toLowerCase().replace(/\s+/g, '-')}-${sourceName.toLowerCase().replace(/\s+/g, '-')}`;
 
+    // Ensure the iframe code is properly formatted
+    let formattedEmbedCode = embedCode.trim();
+    if (!formattedEmbedCode.includes('<iframe')) {
+      // Convert URL to iframe if needed
+      formattedEmbedCode = `<iframe src="${formattedEmbedCode}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
+    }
+
     if (isEditing && currentEditId !== null) {
       // Update existing stream source
       const updatedSources = streamSources.map(source => 
         source.id === currentEditId 
-          ? { ...source, matchId, name: sourceName, embedCode, slug } 
+          ? { ...source, matchId, name: sourceName, embedCode: formattedEmbedCode, slug } 
           : source
       );
       
@@ -103,7 +110,7 @@ const ManageStreamSources = () => {
         id: Date.now(),
         matchId,
         name: sourceName,
-        embedCode,
+        embedCode: formattedEmbedCode,
         slug
       };
       
@@ -207,11 +214,11 @@ const ManageStreamSources = () => {
               id="embedCode"
               value={embedCode}
               onChange={(e) => setEmbedCode(e.target.value)}
-              placeholder="<iframe src='https://example.com/embed' ...></iframe>"
+              placeholder="<iframe src='https://example.com/embed' ...></iframe> or just the URL"
               className="bg-gray-800 border-gray-700 text-white"
             />
             <p className="text-xs text-gray-400">
-              Paste the full iframe code that will be used to display the stream
+              Paste the full iframe code or just the stream URL. We'll convert URLs to proper iframe code automatically.
             </p>
           </div>
           
@@ -269,13 +276,13 @@ const ManageStreamSources = () => {
                     <TableCell>{source.name}</TableCell>
                     <TableCell className="truncate max-w-xs">
                       <a 
-                        href={`/stream/${source.slug}`} 
+                        href={`/local-stream/${source.slug}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-sports-blue hover:underline flex items-center"
                       >
                         <LinkIcon className="h-4 w-4 mr-1" />
-                        /stream/{source.slug}
+                        /local-stream/{source.slug}
                       </a>
                     </TableCell>
                     <TableCell>

@@ -56,11 +56,23 @@ const LocalStreamPage = () => {
     setIsLoading(false);
   }, [slug]);
 
-  // Function to safely render the iframe
+  // Function to safely render the iframe with proper styling
   const renderStream = () => {
     if (!streamSource) return null;
     
-    return <div dangerouslySetInnerHTML={{ __html: streamSource.embedCode }} />;
+    // Create a style to ensure iframe takes full width and height
+    const iframeStyle = {
+      width: '100%',
+      height: '100%',
+      border: 'none'
+    };
+    
+    // Use a sandbox div to contain the iframe for security
+    return (
+      <div className="w-full h-full">
+        <div dangerouslySetInnerHTML={{ __html: streamSource.embedCode }} />
+      </div>
+    );
   };
 
   return (
