@@ -24,6 +24,7 @@ const Header = () => {
             <Link to="/channels" className="text-white hover:text-sports-red transition">24/7 Channels</Link>
             <Link to="/about" className="text-white hover:text-sports-red transition">About Us</Link>
             <Link to="/donate" className="text-white hover:text-sports-red transition">Donate</Link>
+            <Link to="/contact" className="text-white hover:text-sports-red transition">Contact Us</Link>
             
             <div className="flex items-center gap-3 ml-4 border-l pl-4 border-gray-700">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-sports-red transition">
@@ -67,6 +68,7 @@ const Header = () => {
             <li><Link to="/channels" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>24/7 Channels</Link></li>
             <li><Link to="/about" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>About Us</Link></li>
             <li><Link to="/donate" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Donate</Link></li>
+            <li><Link to="/contact" className="block text-white hover:text-sports-red transition" onClick={toggleMenu}>Contact Us</Link></li>
             <li className="pt-4 border-t border-gray-700 mt-4">
               <div className="flex items-center gap-4">
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-sports-red transition">

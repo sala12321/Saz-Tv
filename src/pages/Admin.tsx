@@ -9,6 +9,8 @@ import CreateMatch from '../components/admin/CreateMatch';
 import ManageMatches from '../components/admin/ManageMatches';
 import AddStreamLinks from '../components/admin/AddStreamLinks';
 import ManageChannels from '../components/admin/ManageChannels';
+import Messages from '../components/admin/Messages';
+import ManageStreamSources from '../components/admin/ManageStreamSources';
 
 const Admin = () => {
   const [authenticated, setAuthenticated] = useState(() => {
@@ -46,6 +48,8 @@ const Admin = () => {
             <TabsTrigger value="manage" className="flex-1">Manage Matches</TabsTrigger>
             <TabsTrigger value="streams" className="flex-1">Add Stream Links</TabsTrigger>
             <TabsTrigger value="channels" className="flex-1">Manage Channels</TabsTrigger>
+            <TabsTrigger value="sources" className="flex-1">Stream Sources</TabsTrigger>
+            <TabsTrigger value="messages" className="flex-1">Messages</TabsTrigger>
           </TabsList>
           
           <TabsContent value="create">
@@ -62,6 +66,14 @@ const Admin = () => {
           
           <TabsContent value="channels">
             <ManageChannels />
+          </TabsContent>
+          
+          <TabsContent value="sources">
+            <ManageStreamSources />
+          </TabsContent>
+          
+          <TabsContent value="messages">
+            <Messages />
           </TabsContent>
         </Tabs>
       </div>

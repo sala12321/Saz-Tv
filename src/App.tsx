@@ -17,6 +17,9 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Disclaimer from "./pages/Disclaimer";
 import Dmca from "./pages/Dmca";
+import Contact from "./pages/Contact";
+import LocalStreamPage from "./pages/LocalStreamPage";
+import StreamSourcesList from "./pages/StreamSourcesList";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +42,9 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/dmca" element={<Dmca />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/stream-sources/:id" element={<StreamSourcesList />} />
+          <Route path="/local-stream/:slug" element={<LocalStreamPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
