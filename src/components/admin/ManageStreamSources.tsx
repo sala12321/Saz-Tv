@@ -51,10 +51,14 @@ const ManageStreamSources = () => {
 
   // Load matches and stream sources on mount
   useEffect(() => {
-    const storedMatches = localStorage.getItem('matches');
-    if (storedMatches) {
-      setMatches(JSON.parse(storedMatches));
-    }
+    // Load all matches (both live and upcoming)
+    const liveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]');
+    const upcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]');
+    const allMatches = JSON.parse(localStorage.getItem('matches') || '[]');
+    
+    // Combine all match sources, but prefer using 'matches' if available
+    const combinedMatches = allMatches.length > 0 ? allMatches : [...liveMatches, ...upcomingMatches];
+    setMatches(combinedMatches);
 
     const storedStreamSources = localStorage.getItem('streamSources');
     if (storedStreamSources) {
@@ -163,13 +167,22 @@ const ManageStreamSources = () => {
                   <SelectValue placeholder="Select a match" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                  {matches.map(match => (
-                    <SelectItem key={match.id} value={match.id.toString()} className="focus:bg-gray-700">
-                      {getMatchText(match)}
-                    </SelectItem>
-                  ))}
+                  {matches.length > 0 ? (
+                    matches.map(match => (
+                      <SelectItem key={match.id} value={match.id.toString()} className="focus:bg-gray-700">
+                        {getMatchText(match)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-matches" disabled>No matches available</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
+              {matches.length === 0 && (
+                <p className="text-amber-500 text-xs mt-1">
+                  No matches found. Please add matches first.
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">

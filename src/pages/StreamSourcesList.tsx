@@ -36,9 +36,14 @@ const StreamSourcesList = () => {
     
     const matchId = parseInt(id);
     
-    // Find the match
-    const matches = JSON.parse(localStorage.getItem('matches') || '[]') as Match[];
-    const matchData = matches.find(m => m.id === matchId);
+    // Find the match from all possible sources
+    const liveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]') as Match[];
+    const upcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]') as Match[];
+    const allMatches = JSON.parse(localStorage.getItem('matches') || '[]') as Match[];
+    
+    // Combine all match sources, but prefer using 'matches' if available
+    const combinedMatches = allMatches.length > 0 ? allMatches : [...liveMatches, ...upcomingMatches];
+    const matchData = combinedMatches.find(m => m.id === matchId);
     
     if (matchData) {
       setMatch(matchData);
