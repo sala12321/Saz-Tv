@@ -93,21 +93,23 @@ const LocalStreamPage = () => {
     const processedEmbedCode = getProcessedEmbedCode(streamSource.embedCode);
     
     return (
-      <div className="w-full max-w-5xl mx-auto">
-        <AspectRatio 
-          ratio={16 / 9} 
-          className={cn(
-            "overflow-hidden bg-black border border-gray-800 rounded-lg",
-            isMobile ? "w-full" : "max-h-[70vh]"
-          )}
-        >
-          <div className="relative w-full h-full">
-            <div 
-              className="absolute inset-0"
-              dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
-            />
-          </div>
-        </AspectRatio>
+      <div className="flex justify-center items-center">
+        <div className="w-full max-w-4xl">
+          <AspectRatio 
+            ratio={16 / 9} 
+            className={cn(
+              "overflow-hidden bg-black border border-gray-800 rounded-lg shadow-lg",
+              isMobile ? "w-full" : "h-[calc(100vh-300px)]"
+            )}
+          >
+            <div className="relative w-full h-full">
+              <div 
+                className="absolute inset-0"
+                dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
+              />
+            </div>
+          </AspectRatio>
+        </div>
       </div>
     );
   };

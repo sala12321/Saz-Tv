@@ -1,9 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ExternalLink, Globe, Info } from 'lucide-react';
+import { ExternalLink, Globe, Info, Copy, Bitcoin, Banknote } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface StreamSource {
   id: number;
@@ -28,7 +29,6 @@ const ChannelStream = () => {
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
   
   useEffect(() => {
-    // Format the channel name from slug
     if (slug) {
       const formattedName = slug
         .split('-')
@@ -38,18 +38,17 @@ const ChannelStream = () => {
       setChannelName(formattedName);
     }
     
-    // In a real app, you would fetch stream sources for this channel
-    // For now, we'll use the default streams
-    
-    // Check localStorage for any custom stream sources
     const savedStreams = localStorage.getItem(`channel_${slug}_streams`);
     if (savedStreams) {
       setStreamSources(JSON.parse(savedStreams));
     }
   }, [slug]);
   
-  const handleStreamSelect = (url: string) => {
-    setSelectedStream(url);
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      description: `${label} copied to clipboard!`,
+    });
   };
   
   return (
@@ -66,19 +65,22 @@ const ChannelStream = () => {
             </div>
             
             <div className="bg-gray-900 rounded-lg p-8 mb-8">
-              <div className="aspect-w-16 aspect-h-9 bg-black rounded mb-4">
-                {selectedStream ? (
-                  <iframe 
-                    src={selectedStream} 
-                    allowFullScreen
-                    className="w-full h-full"
-                    style={{ aspectRatio: '16/9' }}
-                  ></iframe>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-gray-400">Stream preview available after selecting a source</p>
+              <div className="flex justify-center items-center">
+                <div className="w-full">
+                  <div className="aspect-w-16 aspect-h-9 bg-black rounded mb-4">
+                    {selectedStream ? (
+                      <iframe 
+                        src={selectedStream} 
+                        allowFullScreen
+                        className="w-full h-full rounded"
+                      ></iframe>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <p className="text-gray-400">Stream preview available after selecting a source</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
               
               <div className="bg-gray-800 rounded-lg p-4 text-center mb-4">
@@ -121,6 +123,53 @@ const ChannelStream = () => {
                   </button>
                 </div>
               ))}
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <Banknote className="text-sports-red h-5 w-5" />
+                <h3 className="text-xl font-semibold text-white">Support SazTV</h3>
+              </div>
+              
+              <p className="text-gray-300 mb-4">
+                Help us keep the streams running by making a small donation. Every contribution helps!
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bitcoin className="text-amber-500 h-5 w-5" />
+                    <h4 className="font-medium text-white">Bitcoin (BTC)</h4>
+                  </div>
+                  <div className="flex items-center justify-between bg-gray-700 rounded p-2">
+                    <code className="text-xs text-gray-300 truncate">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', 'BTC address')}
+                    >
+                      <Copy size={16} />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Banknote className="text-green-500 h-5 w-5" />
+                    <h4 className="font-medium text-white">Bank Transfer</h4>
+                  </div>
+                  <div className="flex items-center justify-between bg-gray-700 rounded p-2">
+                    <code className="text-xs text-gray-300 truncate">IBAN: ES91 2100 0418 4502 0005 1332</code>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('ES91 2100 0418 4502 0005 1332', 'IBAN')}
+                    >
+                      <Copy size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div className="bg-gray-900 rounded-lg p-6">
