@@ -1,11 +1,9 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, AlertTriangle, Copy, Bitcoin, Banknote } from 'lucide-react';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -59,24 +57,19 @@ const LocalStreamPage = () => {
     setIsLoading(false);
   }, [slug]);
 
-  // Helper function to ensure the iframe is properly formatted
   const getProcessedEmbedCode = (code: string): string => {
-    // If the code already contains an iframe, make sure it's responsive
     if (code.includes('<iframe')) {
-      // Add necessary attributes for responsiveness if they don't exist
       let processedCode = code
         .replace(/width="[^"]*"/g, 'width="100%"')
         .replace(/height="[^"]*"/g, 'height="100%"');
       
-      // Add style for fullscreen if not present
       if (!processedCode.includes('style=')) {
-        processedCode = processedCode.replace('<iframe', '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"');
+        processedCode = processedCode.replace('<iframe', '<iframe style="width:100%;height:calc(100vh - 200px);border:0;border-radius:0.5rem;"');
       }
       
       return processedCode;
     } else {
-      // If it's just a URL, create a responsive iframe
-      return `<iframe src="${code}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>`;
+      return `<iframe src="${code}" style="width:100%;height:calc(100vh - 200px);border:0;border-radius:0.5rem;" allowfullscreen></iframe>`;
     }
   };
 
@@ -93,24 +86,10 @@ const LocalStreamPage = () => {
     const processedEmbedCode = getProcessedEmbedCode(streamSource.embedCode);
     
     return (
-      <div className="flex justify-center items-center">
-        <div className="w-full max-w-4xl">
-          <AspectRatio 
-            ratio={16 / 9} 
-            className={cn(
-              "overflow-hidden bg-black border border-gray-800 rounded-lg shadow-lg",
-              isMobile ? "w-full" : "h-[calc(100vh-300px)]"
-            )}
-          >
-            <div className="relative w-full h-full">
-              <div 
-                className="absolute inset-0"
-                dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
-              />
-            </div>
-          </AspectRatio>
-        </div>
-      </div>
+      <div 
+        className="w-full max-w-5xl mx-auto mb-6"
+        dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
+      />
     );
   };
 
@@ -134,18 +113,16 @@ const LocalStreamPage = () => {
         ) : streamSource && match ? (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-white mb-1">
                 {match.homeTeam} vs {match.awayTeam}
               </h1>
               <p className="text-gray-400">
-                {match.competition} • {new Date(match.date).toLocaleDateString()} • {streamSource.name}
+                {match.competition} • {new Date(match.date).toLocaleDateString()}
               </p>
             </div>
             
-            <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-              {renderStream()}
-            </div>
-
+            {renderStream()}
+            
             {/* Donate Section */}
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <div className="flex items-center gap-3 mb-4">
@@ -204,6 +181,7 @@ const LocalStreamPage = () => {
               </div>
             </div>
             
+            {/* Disclaimer */}
             <div className="bg-amber-900/30 border border-amber-700/50 text-amber-200 p-4 rounded-lg">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 mt-0.5" />

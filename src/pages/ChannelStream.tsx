@@ -51,6 +51,10 @@ const ChannelStream = () => {
     });
   };
   
+  const handleStreamSelect = (url: string) => {
+    setSelectedStream(url);
+  };
+  
   return (
     <div className="min-h-screen bg-sports-dark flex flex-col">
       <Header />
