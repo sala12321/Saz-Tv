@@ -8,6 +8,7 @@ import { ArrowLeft, AlertTriangle, Copy, Bitcoin, Banknote } from 'lucide-react'
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface StreamSource {
   id: number;
@@ -92,17 +93,22 @@ const LocalStreamPage = () => {
     const processedEmbedCode = getProcessedEmbedCode(streamSource.embedCode);
     
     return (
-      <AspectRatio 
-        ratio={16 / 9} 
-        className={`overflow-hidden bg-black ${isMobile ? '' : 'max-h-[70vh]'}`}
-      >
-        <div className="relative w-full h-full">
-          <div 
-            className="absolute inset-0"
-            dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
-          />
-        </div>
-      </AspectRatio>
+      <div className="w-full max-w-5xl mx-auto">
+        <AspectRatio 
+          ratio={16 / 9} 
+          className={cn(
+            "overflow-hidden bg-black border border-gray-800 rounded-lg",
+            isMobile ? "w-full" : "max-h-[70vh]"
+          )}
+        >
+          <div className="relative w-full h-full">
+            <div 
+              className="absolute inset-0"
+              dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
+            />
+          </div>
+        </AspectRatio>
+      </div>
     );
   };
 
