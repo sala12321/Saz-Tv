@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -53,15 +54,38 @@ const LocalStreamPage = () => {
     setIsLoading(false);
   }, [slug]);
 
+  // Helper function to ensure the iframe is properly formatted
+  const getProcessedEmbedCode = (code: string): string => {
+    // If the code already contains an iframe, make sure it's responsive
+    if (code.includes('<iframe')) {
+      // Add necessary attributes for responsiveness if they don't exist
+      let processedCode = code
+        .replace(/width="[^"]*"/g, 'width="100%"')
+        .replace(/height="[^"]*"/g, 'height="100%"');
+      
+      // Add style for fullscreen if not present
+      if (!processedCode.includes('style=')) {
+        processedCode = processedCode.replace('<iframe', '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"');
+      }
+      
+      return processedCode;
+    } else {
+      // If it's just a URL, create a responsive iframe
+      return `<iframe src="${code}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>`;
+    }
+  };
+
   const renderStream = () => {
     if (!streamSource) return null;
     
+    const processedEmbedCode = getProcessedEmbedCode(streamSource.embedCode);
+    
     return (
       <AspectRatio ratio={16 / 9} className="overflow-hidden bg-black">
-        <div className="w-full h-full">
+        <div className="relative w-full h-full">
           <div 
-            className="relative w-full h-full"
-            dangerouslySetInnerHTML={{ __html: streamSource.embedCode }} 
+            className="absolute inset-0"
+            dangerouslySetInnerHTML={{ __html: processedEmbedCode }} 
           />
         </div>
       </AspectRatio>
