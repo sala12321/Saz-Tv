@@ -1,11 +1,13 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Copy, Bitcoin, Banknote } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StreamSource {
   id: number;
@@ -31,6 +33,8 @@ const LocalStreamPage = () => {
   const [streamSource, setStreamSource] = useState<StreamSource | null>(null);
   const [match, setMatch] = useState<Match | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const sources = JSON.parse(localStorage.getItem('streamSources') || '[]') as StreamSource[];
@@ -75,13 +79,23 @@ const LocalStreamPage = () => {
     }
   };
 
+  const copyToClipboard = useCallback((text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      description: `${label} copied to clipboard!`,
+    });
+  }, [toast]);
+
   const renderStream = () => {
     if (!streamSource) return null;
     
     const processedEmbedCode = getProcessedEmbedCode(streamSource.embedCode);
     
     return (
-      <AspectRatio ratio={16 / 9} className="overflow-hidden bg-black">
+      <AspectRatio 
+        ratio={16 / 9} 
+        className={`overflow-hidden bg-black ${isMobile ? '' : 'max-h-[70vh]'}`}
+      >
         <div className="relative w-full h-full">
           <div 
             className="absolute inset-0"
@@ -122,6 +136,64 @@ const LocalStreamPage = () => {
             
             <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
               {renderStream()}
+            </div>
+
+            {/* Donate Section */}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+              <div className="flex items-center gap-3 mb-4">
+                <Banknote className="text-sports-red h-5 w-5" />
+                <h3 className="text-xl font-semibold text-white">Support SazTV</h3>
+              </div>
+              
+              <p className="text-gray-300 mb-4">
+                Help us keep the streams running by making a small donation. Every contribution helps!
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bitcoin className="text-amber-500 h-5 w-5" />
+                    <h4 className="font-medium text-white">Bitcoin (BTC)</h4>
+                  </div>
+                  <div className="flex items-center justify-between bg-gray-700 rounded p-2">
+                    <code className="text-xs text-gray-300 truncate">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', 'BTC address')}
+                    >
+                      <Copy size={16} />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Banknote className="text-green-500 h-5 w-5" />
+                    <h4 className="font-medium text-white">Bank Transfer</h4>
+                  </div>
+                  <div className="flex items-center justify-between bg-gray-700 rounded p-2">
+                    <code className="text-xs text-gray-300 truncate">IBAN: ES91 2100 0418 4502 0005 1332</code>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('ES91 2100 0418 4502 0005 1332', 'IBAN')}
+                    >
+                      <Copy size={16} />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="col-span-1 md:col-span-2">
+                  <Button 
+                    variant="default" 
+                    className="w-full bg-sports-red hover:bg-red-700"
+                    onClick={() => navigate('/donate')}
+                  >
+                    More Donation Options
+                  </Button>
+                </div>
+              </div>
             </div>
             
             <div className="bg-amber-900/30 border border-amber-700/50 text-amber-200 p-4 rounded-lg">

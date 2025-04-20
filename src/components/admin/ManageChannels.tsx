@@ -4,14 +4,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Edit, Trash2, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Edit, Trash2, Plus, Image } from 'lucide-react';
 
 interface Channel {
   id: number;
   name: string;
   logo: string;
   slug: string;
+  logoUrl?: string;
 }
 
 interface Stream {
@@ -27,7 +28,7 @@ const ManageChannels = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isStreamDialogOpen, setIsStreamDialogOpen] = useState(false);
-  const [newChannel, setNewChannel] = useState({ name: '', logo: '📺', slug: '' });
+  const [newChannel, setNewChannel] = useState({ name: '', logo: '📺', slug: '', logoUrl: '' });
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [currentChannelStreams, setCurrentChannelStreams] = useState<Stream[]>([]);
   const [selectedChannelSlug, setSelectedChannelSlug] = useState('');
@@ -46,14 +47,9 @@ const ManageChannels = () => {
     if (savedChannels) {
       setChannels(JSON.parse(savedChannels));
     } else {
-      // Default channels
-      const defaultChannels = [
-        { id: 1, name: 'TNT Sports', logo: '🔴', slug: 'tnt-sports' },
-        { id: 2, name: 'SuperSport', logo: '⚪', slug: 'super-sport' },
-        { id: 3, name: 'beIN Sports', logo: '🟢', slug: 'bein-sports' }
-      ];
-      setChannels(defaultChannels);
-      localStorage.setItem('channels', JSON.stringify(defaultChannels));
+      // Initialize with empty array instead of default channels
+      setChannels([]);
+      localStorage.setItem('channels', JSON.stringify([]));
     }
   }, []);
 
@@ -74,14 +70,15 @@ const ManageChannels = () => {
       id: channels.length ? Math.max(...channels.map(c => c.id)) + 1 : 1,
       name: newChannel.name,
       logo: newChannel.logo || '📺',
-      slug
+      slug,
+      logoUrl: newChannel.logoUrl || ''
     };
     
     const updatedChannels = [...channels, newChannelWithId];
     setChannels(updatedChannels);
     localStorage.setItem('channels', JSON.stringify(updatedChannels));
     
-    setNewChannel({ name: '', logo: '📺', slug: '' });
+    setNewChannel({ name: '', logo: '📺', slug: '', logoUrl: '' });
     setIsAddDialogOpen(false);
     
     toast({
@@ -211,7 +208,17 @@ const ManageChannels = () => {
             <TableBody>
               {channels.map((channel) => (
                 <TableRow key={channel.id}>
-                  <TableCell className="text-2xl">{channel.logo}</TableCell>
+                  <TableCell>
+                    {channel.logoUrl ? (
+                      <img 
+                        src={channel.logoUrl} 
+                        alt={`${channel.name} logo`} 
+                        className="w-10 h-10 rounded-full object-cover" 
+                      />
+                    ) : (
+                      <div className="text-2xl">{channel.logo}</div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{channel.name}</TableCell>
                   <TableCell className="text-gray-400">{channel.slug}</TableCell>
                   <TableCell>
@@ -271,6 +278,20 @@ const ManageChannels = () => {
               />
             </div>
             <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <Image size={16} />
+                  <span>Logo Image URL (optional)</span>
+                </div>
+              </label>
+              <Input 
+                value={newChannel.logoUrl}
+                onChange={(e) => setNewChannel({...newChannel, logoUrl: e.target.value})}
+                placeholder="https://example.com/logo.png"
+              />
+              <p className="text-xs text-gray-400">Add an image URL for your channel logo</p>
+            </div>
+            <div className="grid gap-2">
               <label className="text-sm font-medium">Slug (optional)</label>
               <Input 
                 value={newChannel.slug}
@@ -308,6 +329,20 @@ const ManageChannels = () => {
                 onChange={(e) => setEditingChannel(editingChannel ? {...editingChannel, logo: e.target.value} : null)}
                 placeholder="e.g. 📺"
               />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <Image size={16} />
+                  <span>Logo Image URL (optional)</span>
+                </div>
+              </label>
+              <Input 
+                value={editingChannel?.logoUrl || ''}
+                onChange={(e) => setEditingChannel(editingChannel ? {...editingChannel, logoUrl: e.target.value} : null)}
+                placeholder="https://example.com/logo.png"
+              />
+              <p className="text-xs text-gray-400">Add an image URL for your channel logo</p>
             </div>
             <div className="grid gap-2">
               <label className="text-sm font-medium">Slug</label>

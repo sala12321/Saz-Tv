@@ -1,26 +1,31 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Play, Tv } from 'lucide-react';
+import { Play, Tv, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const channels = [
-  { id: 1, name: 'TNT Sports', logo: '🔴', slug: 'tnt-sports' },
-  { id: 2, name: 'SuperSport', logo: '⚪', slug: 'super-sport' },
-  { id: 3, name: 'beIN Sports', logo: '🟢', slug: 'bein-sports' },
-  { id: 4, name: 'ESPN', logo: '🔵', slug: 'espn' },
-  { id: 5, name: 'Sky Sports', logo: '🟠', slug: 'sky-sports' },
-  { id: 6, name: 'BT Sport', logo: '🟣', slug: 'bt-sport' },
-  { id: 7, name: 'DAZN', logo: '⚫', slug: 'dazn' },
-  { id: 8, name: 'Eurosport', logo: '🔴', slug: 'eurosport' },
-  { id: 9, name: 'Fox Sports', logo: '⚪', slug: 'fox-sports' },
-  { id: 10, name: 'Arena Sport', logo: '🟢', slug: 'arena-sport' },
-  { id: 11, name: 'Premier Sports', logo: '🔵', slug: 'premier-sports' },
-  { id: 12, name: 'Sport TV', logo: '🟠', slug: 'sport-tv' },
-];
+interface Channel {
+  id: number;
+  name: string;
+  logo: string;
+  slug: string;
+  logoUrl?: string;
+}
 
 const Channels = () => {
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Load channels from localStorage
+    const savedChannels = localStorage.getItem('channels');
+    if (savedChannels) {
+      setChannels(JSON.parse(savedChannels));
+    }
+    setLoading(false);
+  }, []);
+
   return (
     <div className="min-h-screen bg-sports-dark flex flex-col">
       <Header />
@@ -38,24 +43,47 @@ const Channels = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {channels.map((channel) => (
-              <Link
-                to={`/channel/${channel.slug}`}
-                key={channel.id}
-                className="bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition flex flex-col items-center text-center"
-              >
-                <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center text-3xl mb-3">
-                  {channel.logo}
-                </div>
-                <h3 className="font-medium text-white mb-2">{channel.name}</h3>
-                <div className="mt-auto flex items-center gap-1 text-sports-red hover:text-red-400 text-sm">
-                  <Play size={14} />
-                  <span>Watch Live</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-300">Loading channels...</p>
+            </div>
+          ) : channels.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {channels.map((channel) => (
+                <Link
+                  to={`/channel/${channel.slug}`}
+                  key={channel.id}
+                  className="bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition flex flex-col items-center text-center"
+                >
+                  {channel.logoUrl ? (
+                    <img 
+                      src={channel.logoUrl} 
+                      alt={`${channel.name} logo`} 
+                      className="w-16 h-16 rounded-full object-cover mb-3" 
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center text-3xl mb-3">
+                      {channel.logo}
+                    </div>
+                  )}
+                  <h3 className="font-medium text-white mb-2">{channel.name}</h3>
+                  <div className="mt-auto flex items-center gap-1 text-sports-red hover:text-red-400 text-sm">
+                    <Play size={14} />
+                    <span>Watch Live</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-gray-900 rounded-lg">
+              <AlertCircle className="mx-auto h-12 w-12 text-amber-500 mb-4" />
+              <h2 className="text-xl font-semibold text-white mb-2">No Channels Available</h2>
+              <p className="text-gray-400 max-w-md mx-auto">
+                There are no channels available at the moment. 
+                Channels can be added from the Admin Dashboard.
+              </p>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
