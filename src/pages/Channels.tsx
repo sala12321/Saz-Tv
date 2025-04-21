@@ -10,6 +10,7 @@ import type { Channel } from '../types/supabase';
 const Channels = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchChannels() {
@@ -20,12 +21,15 @@ const Channels = () => {
         
         if (error) {
           console.error('Error fetching channels:', error);
+          setError(error.message);
           return;
         }
         
         setChannels(data || []);
+        setError(null);
       } catch (err) {
         console.error('Failed to fetch channels:', err);
+        setError('Failed to load channels. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -54,6 +58,10 @@ const Channels = () => {
           {loading ? (
             <div className="text-center py-12">
               <p className="text-gray-300">Loading channels...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-400">{error}</p>
             </div>
           ) : channels.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">

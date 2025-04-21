@@ -3,35 +3,74 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
-
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  time: string;
-  score: string;
-  links: number;
-  slug: string;
-  date?: string;
-}
+import { supabase } from '../lib/supabase';
+import type { Match } from '../types/supabase';
 
 const LiveMatches = () => {
   const [matches, setMatches] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    const savedMatches = localStorage.getItem('liveMatches');
-    if (savedMatches) {
-      const parsedMatches = JSON.parse(savedMatches);
-      const today = format(new Date(), 'yyyy-MM-dd');
-      
-      const todayMatches = parsedMatches.filter((match: Match) => 
-        match.date === today
-      );
-      
-      setMatches(todayMatches);
+    async function fetchLiveMatches() {
+      try {
+        const { data, error } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('type', 'live');
+        
+        if (error) {
+          console.error('Error fetching live matches:', error);
+          setError(error.message);
+          return;
+        }
+        
+        setMatches(data || []);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch live matches:', err);
+        setError('Failed to load live matches. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     }
+
+    fetchLiveMatches();
   }, []);
+
+  if (loading) {
+    return (
+      <section className="py-10 bg-sports-dark-blue">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Live Matches</h2>
+            <Link to="/live" className="text-sports-red hover:text-red-400 transition">View All</Link>
+          </div>
+          
+          <div className="bg-gray-900 rounded-lg p-8 text-center">
+            <p className="text-gray-400">Loading live matches...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-10 bg-sports-dark-blue">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Live Matches</h2>
+            <Link to="/live" className="text-sports-red hover:text-red-400 transition">View All</Link>
+          </div>
+          
+          <div className="bg-gray-900 rounded-lg p-8 text-center text-red-400">
+            {error}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (matches.length === 0) {
     return (
@@ -86,7 +125,7 @@ const LiveMatches = () => {
                   to={`/stream/${match.slug}`}
                   className="bg-sports-blue hover:bg-blue-700 text-white text-sm px-4 py-2 rounded flex items-center gap-2"
                 >
-                  <span>{match.links} Stream Links</span>
+                  <span>Watch Stream</span>
                   <ExternalLink size={14} />
                 </Link>
               </div>

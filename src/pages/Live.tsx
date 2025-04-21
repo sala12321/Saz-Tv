@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -10,6 +10,7 @@ import type { Match } from '../types/supabase';
 const Live = () => {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     async function fetchLiveMatches() {
@@ -21,12 +22,15 @@ const Live = () => {
         
         if (error) {
           console.error('Error fetching live matches:', error);
+          setError(error.message);
           return;
         }
         
         setLiveMatches(data || []);
+        setError(null);
       } catch (err) {
         console.error('Failed to fetch live matches:', err);
+        setError('Failed to load live matches. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -50,9 +54,14 @@ const Live = () => {
           <div className="bg-gray-900 rounded-lg p-6 text-center">
             <p className="text-gray-400">Loading live matches...</p>
           </div>
+        ) : error ? (
+          <div className="bg-gray-900 rounded-lg p-6 text-center text-red-400">
+            {error}
+          </div>
         ) : liveMatches.length === 0 ? (
           <div className="bg-gray-900 rounded-lg p-6 text-center">
             <p className="text-gray-400">No live matches available at the moment.</p>
+            <p className="text-gray-500 mt-2">Please check back later or visit the admin dashboard to add matches.</p>
           </div>
         ) : (
           <div className="grid gap-4">

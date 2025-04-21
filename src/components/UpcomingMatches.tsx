@@ -8,6 +8,7 @@ import type { Match } from '../types/supabase';
 const UpcomingMatches = () => {
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUpcomingMatches() {
@@ -20,12 +21,15 @@ const UpcomingMatches = () => {
         
         if (error) {
           console.error('Error fetching upcoming matches:', error);
+          setError(error.message);
           return;
         }
         
         setUpcoming(data || []);
+        setError(null);
       } catch (err) {
         console.error('Failed to fetch upcoming matches:', err);
+        setError('Failed to load matches. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -46,9 +50,13 @@ const UpcomingMatches = () => {
           <div className="bg-gray-900 rounded-lg p-8 text-center text-gray-400">
             Loading upcoming matches...
           </div>
+        ) : error ? (
+          <div className="bg-gray-900 rounded-lg p-8 text-center text-red-400">
+            {error}
+          </div>
         ) : upcoming.length === 0 ? (
           <div className="bg-gray-900 rounded-lg p-8 text-center text-gray-400 text-md">
-            No upcoming matches scheduled.
+            No upcoming matches scheduled. Add matches through the Admin Dashboard.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

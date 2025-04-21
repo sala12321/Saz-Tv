@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Hero from '../components/Hero';
 import UpcomingMatches from '../components/UpcomingMatches';
 import TomorrowMatches from '../components/TomorrowMatches';
+import LiveMatches from '../components/LiveMatches';
 import Footer from '../components/Footer';
 
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <LiveMatches />
         <UpcomingMatches />
         <TomorrowMatches />
       </main>

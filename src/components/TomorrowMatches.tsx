@@ -9,6 +9,7 @@ import type { Match } from '../types/supabase';
 const TomorrowMatches = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchTomorrowMatches() {
@@ -23,12 +24,15 @@ const TomorrowMatches = () => {
         
         if (error) {
           console.error('Error fetching tomorrow matches:', error);
+          setError(error.message);
           return;
         }
         
         setMatches(data || []);
+        setError(null);
       } catch (err) {
         console.error('Failed to fetch tomorrow matches:', err);
+        setError('Failed to load tomorrow\'s matches. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -37,7 +41,28 @@ const TomorrowMatches = () => {
     fetchTomorrowMatches();
   }, []);
 
-  if (loading) return null;
+  if (loading) return (
+    <section className="py-10 bg-sports-dark-blue">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold text-white mb-6">Tomorrow's Matches</h2>
+        <div className="bg-gray-900 rounded-lg p-8 text-center text-gray-400">
+          Loading tomorrow's matches...
+        </div>
+      </div>
+    </section>
+  );
+  
+  if (error) return (
+    <section className="py-10 bg-sports-dark-blue">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold text-white mb-6">Tomorrow's Matches</h2>
+        <div className="bg-gray-900 rounded-lg p-8 text-center text-red-400">
+          {error}
+        </div>
+      </div>
+    </section>
+  );
+  
   if (matches.length === 0) return null;
 
   return (
