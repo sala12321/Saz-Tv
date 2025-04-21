@@ -3,35 +3,41 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { format, addDays } from 'date-fns';
-
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  time: string;
-  date?: string;
-  slug: string;
-}
+import { supabase } from '../lib/supabase';
+import type { Match } from '../types/supabase';
 
 const TomorrowMatches = () => {
   const [matches, setMatches] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedMatches = localStorage.getItem('upcomingMatches');
-    if (savedMatches) {
-      const parsedMatches = JSON.parse(savedMatches);
+    async function fetchTomorrowMatches() {
       const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
       
-      // Filter matches for tomorrow only
-      const tomorrowMatches = parsedMatches.filter((match: Match) => 
-        match.date === tomorrow
-      );
-      
-      setMatches(tomorrowMatches);
+      try {
+        const { data, error } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('type', 'upcoming')
+          .eq('date', tomorrow);
+        
+        if (error) {
+          console.error('Error fetching tomorrow matches:', error);
+          return;
+        }
+        
+        setMatches(data || []);
+      } catch (err) {
+        console.error('Failed to fetch tomorrow matches:', err);
+      } finally {
+        setLoading(false);
+      }
     }
+
+    fetchTomorrowMatches();
   }, []);
 
+  if (loading) return null;
   if (matches.length === 0) return null;
 
   return (

@@ -2,27 +2,36 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  date: string;
-  time: string;
-  slug: string;
-}
+import { supabase } from '../lib/supabase';
+import type { Match } from '../types/supabase';
 
 const UpcomingMatches = () => {
   const [upcoming, setUpcoming] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load matches from localStorage if available
-    const savedMatches = localStorage.getItem('upcomingMatches');
-    if (savedMatches) {
-      const parsedMatches = JSON.parse(savedMatches);
-      setUpcoming(parsedMatches || []);
+    async function fetchUpcomingMatches() {
+      try {
+        const { data, error } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('type', 'upcoming')
+          .order('date', { ascending: true });
+        
+        if (error) {
+          console.error('Error fetching upcoming matches:', error);
+          return;
+        }
+        
+        setUpcoming(data || []);
+      } catch (err) {
+        console.error('Failed to fetch upcoming matches:', err);
+      } finally {
+        setLoading(false);
+      }
     }
+
+    fetchUpcomingMatches();
   }, []);
 
   return (
@@ -33,7 +42,11 @@ const UpcomingMatches = () => {
           <Link to="/schedule" className="text-sports-red hover:text-red-400 transition">Full Schedule</Link>
         </div>
         
-        {upcoming.length === 0 ? (
+        {loading ? (
+          <div className="bg-gray-900 rounded-lg p-8 text-center text-gray-400">
+            Loading upcoming matches...
+          </div>
+        ) : upcoming.length === 0 ? (
           <div className="bg-gray-900 rounded-lg p-8 text-center text-gray-400 text-md">
             No upcoming matches scheduled.
           </div>

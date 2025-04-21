@@ -4,37 +4,35 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-
-interface StreamLink {
-  id: number;
-  matchId: number;
-  name: string;
-  url: string;
-  quality: string;
-  language?: string;
-  channel?: string;
-}
-
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  date?: string;
-  time?: string;
-  score?: string;
-  slug: string;
-}
+import { supabase } from '../lib/supabase';
+import type { Match } from '../types/supabase';
 
 const Live = () => {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Load live matches from localStorage
-    const loadedMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]');
-    setLiveMatches(loadedMatches);
+    async function fetchLiveMatches() {
+      try {
+        const { data, error } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('type', 'live');
+        
+        if (error) {
+          console.error('Error fetching live matches:', error);
+          return;
+        }
+        
+        setLiveMatches(data || []);
+      } catch (err) {
+        console.error('Failed to fetch live matches:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLiveMatches();
   }, []);
 
   return (
@@ -48,7 +46,11 @@ const Live = () => {
         
         <h1 className="text-2xl font-bold text-white mb-6">Live Streams</h1>
         
-        {liveMatches.length === 0 ? (
+        {loading ? (
+          <div className="bg-gray-900 rounded-lg p-6 text-center">
+            <p className="text-gray-400">Loading live matches...</p>
+          </div>
+        ) : liveMatches.length === 0 ? (
           <div className="bg-gray-900 rounded-lg p-6 text-center">
             <p className="text-gray-400">No live matches available at the moment.</p>
           </div>

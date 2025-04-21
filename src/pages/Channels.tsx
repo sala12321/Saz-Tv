@@ -4,26 +4,34 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Play, Tv, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-interface Channel {
-  id: number;
-  name: string;
-  logo: string;
-  slug: string;
-  logoUrl?: string;
-}
+import { supabase } from '../lib/supabase';
+import type { Channel } from '../types/supabase';
 
 const Channels = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load channels from localStorage
-    const savedChannels = localStorage.getItem('channels');
-    if (savedChannels) {
-      setChannels(JSON.parse(savedChannels));
+    async function fetchChannels() {
+      try {
+        const { data, error } = await supabase
+          .from('channels')
+          .select('*');
+        
+        if (error) {
+          console.error('Error fetching channels:', error);
+          return;
+        }
+        
+        setChannels(data || []);
+      } catch (err) {
+        console.error('Failed to fetch channels:', err);
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(false);
+
+    fetchChannels();
   }, []);
 
   return (
