@@ -6,18 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from 'lucide-react';
 import EditMatch from './EditMatch';
-
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  date: string;
-  time: string;
-  slug: string;
-  score?: string;
-  links: number;
-}
+import { supabase } from '@/lib/supabase';
+import type { Match } from '@/types/supabase';
 
 const ManageMatches = () => {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
@@ -25,32 +15,91 @@ const ManageMatches = () => {
   const [selectedType, setSelectedType] = useState<'live' | 'upcoming'>('live');
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  const fetchMatches = async () => {
+    setLoading(true);
+    try {
+      // Fetch live matches
+      const { data: liveData, error: liveError } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('type', 'live');
+
+      if (liveError) {
+        toast({
+          title: "Error",
+          description: `Failed to fetch live matches: ${liveError.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fetch upcoming matches
+      const { data: upcomingData, error: upcomingError } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('type', 'upcoming');
+
+      if (upcomingError) {
+        toast({
+          title: "Error",
+          description: `Failed to fetch upcoming matches: ${upcomingError.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setLiveMatches(liveData || []);
+      setUpcomingMatches(upcomingData || []);
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while fetching matches.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Load matches from localStorage
-    const loadedLiveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]');
-    const loadedUpcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]');
-    
-    setLiveMatches(loadedLiveMatches);
-    setUpcomingMatches(loadedUpcomingMatches);
+    fetchMatches();
   }, []);
 
-  const handleDelete = (id: number) => {
-    if (selectedType === 'live') {
-      const updatedMatches = liveMatches.filter(match => match.id !== id);
-      setLiveMatches(updatedMatches);
-      localStorage.setItem('liveMatches', JSON.stringify(updatedMatches));
-    } else {
-      const updatedMatches = upcomingMatches.filter(match => match.id !== id);
-      setUpcomingMatches(updatedMatches);
-      localStorage.setItem('upcomingMatches', JSON.stringify(updatedMatches));
-    }
+  const handleDelete = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('matches')
+        .delete()
+        .eq('id', id);
 
-    toast({
-      title: "Match Deleted",
-      description: "The match has been successfully deleted.",
-    });
+      if (error) {
+        toast({
+          title: "Error",
+          description: `Failed to delete match: ${error.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Refresh matches
+      await fetchMatches();
+
+      toast({
+        title: "Match Deleted",
+        description: "The match has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting match:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting the match.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEdit = (match: Match) => {
@@ -58,26 +107,47 @@ const ManageMatches = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSaveEdit = (updatedMatch: Match) => {
-    if (selectedType === 'live') {
-      const updatedMatches = liveMatches.map(match => 
-        match.id === updatedMatch.id ? updatedMatch : match
-      );
-      setLiveMatches(updatedMatches);
-      localStorage.setItem('liveMatches', JSON.stringify(updatedMatches));
-    } else {
-      const updatedMatches = upcomingMatches.map(match => 
-        match.id === updatedMatch.id ? updatedMatch : match
-      );
-      setUpcomingMatches(updatedMatches);
-      localStorage.setItem('upcomingMatches', JSON.stringify(updatedMatches));
-    }
+  const handleSaveEdit = async (updatedMatch: Match) => {
+    try {
+      const { error } = await supabase
+        .from('matches')
+        .update({
+          competition: updatedMatch.competition,
+          home_team: updatedMatch.home_team,
+          away_team: updatedMatch.away_team,
+          date: updatedMatch.date,
+          time: updatedMatch.time,
+          slug: updatedMatch.slug,
+          score: updatedMatch.score,
+          type: updatedMatch.type
+        })
+        .eq('id', updatedMatch.id);
 
-    setIsDialogOpen(false);
-    toast({
-      title: "Match Updated",
-      description: "The match has been successfully updated.",
-    });
+      if (error) {
+        toast({
+          title: "Error",
+          description: `Failed to update match: ${error.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Refresh matches
+      await fetchMatches();
+
+      setIsDialogOpen(false);
+      toast({
+        title: "Match Updated",
+        description: "The match has been successfully updated.",
+      });
+    } catch (error) {
+      console.error("Error updating match:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while updating the match.",
+        variant: "destructive",
+      });
+    }
   };
 
   const currentMatches = selectedType === 'live' ? liveMatches : upcomingMatches;
@@ -102,7 +172,11 @@ const ManageMatches = () => {
         </div>
       </div>
 
-      {currentMatches.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-8 text-gray-400">
+          Loading matches...
+        </div>
+      ) : currentMatches.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           No {selectedType} matches found. Create some matches first.
         </div>
@@ -123,8 +197,8 @@ const ManageMatches = () => {
                 <TableRow key={match.id}>
                   <TableCell className="font-medium">{match.competition}</TableCell>
                   <TableCell>
-                    {match.homeTeam}
-                    {match.awayTeam && <> vs {match.awayTeam}</>}
+                    {match.home_team}
+                    {match.away_team && <> vs {match.away_team}</>}
                   </TableCell>
                   <TableCell>
                     {match.date} <br />

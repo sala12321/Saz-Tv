@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Form,
@@ -10,21 +9,23 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { Match } from '@/types/supabase';
 
-interface Match {
-  id: number;
-  competition: string;
-  homeTeam: string;
-  awayTeam: string;
-  date: string;
-  time: string;
-  slug: string;
-  score?: string;
-  links: number;
-}
+const formSchema = z.object({
+  competition: z.string().min(1, "Competition is required"),
+  home_team: z.string().min(1, "Home team is required"),
+  away_team: z.string().nullable(),
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
+  slug: z.string().min(1, "Slug is required"),
+  score: z.string().nullable().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface EditMatchProps {
   match: Match;
@@ -32,25 +33,13 @@ interface EditMatchProps {
   matchType: 'live' | 'upcoming';
 }
 
-const formSchema = z.object({
-  competition: z.string().min(1, "Competition is required"),
-  homeTeam: z.string().min(1, "Home team is required"),
-  awayTeam: z.string(),
-  date: z.string().min(1, "Date is required"),
-  time: z.string().min(1, "Time is required"),
-  slug: z.string().min(1, "Slug is required"),
-  score: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const EditMatch: React.FC<EditMatchProps> = ({ match, onSave, matchType }) => {
+const EditMatch = ({ match, onSave, matchType }: EditMatchProps) => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       competition: match.competition,
-      homeTeam: match.homeTeam,
-      awayTeam: match.awayTeam,
+      home_team: match.home_team,
+      away_team: match.away_team,
       date: match.date,
       time: match.time,
       slug: match.slug,
@@ -58,47 +47,67 @@ const EditMatch: React.FC<EditMatchProps> = ({ match, onSave, matchType }) => {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    onSave({
+  const handleSubmit = (data: FormData) => {
+    const updatedMatch: Match = {
       ...match,
       competition: data.competition,
-      homeTeam: data.homeTeam,
-      awayTeam: data.awayTeam,
+      home_team: data.home_team,
+      away_team: data.away_team,
       date: data.date,
       time: data.time,
       slug: data.slug,
-      score: data.score,
-    });
+      score: matchType === 'live' ? (data.score || '0-0') : null,
+    };
+    
+    onSave(updatedMatch);
   };
 
   const generateSlug = () => {
-    const homeTeam = form.getValues('homeTeam').toLowerCase().replace(/\s+/g, '-');
-    const awayTeam = form.getValues('awayTeam').toLowerCase().replace(/\s+/g, '-');
+    const homeTeam = form.getValues('home_team').toLowerCase().replace(/\s+/g, '-');
+    const awayTeam = form.getValues('away_team')?.toLowerCase().replace(/\s+/g, '-');
     const slug = awayTeam ? `${homeTeam}-vs-${awayTeam}` : homeTeam;
     form.setValue('slug', slug);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="competition"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Competition</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. UEFA Champions League" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="competition"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Competition</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. UEFA Champions League" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {matchType === 'live' && (
+            <FormField
+              control={form.control}
+              name="score"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Score</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. 2-1" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           )}
-        />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="homeTeam"
+            name="home_team"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Home Team</FormLabel>
@@ -112,34 +121,22 @@ const EditMatch: React.FC<EditMatchProps> = ({ match, onSave, matchType }) => {
           
           <FormField
             control={form.control}
-            name="awayTeam"
+            name="away_team"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Away Team</FormLabel>
                 <FormControl>
-                  <Input placeholder="Away Team (optional for single events)" {...field} />
+                  <Input 
+                    placeholder="Away Team (optional for single events)" 
+                    {...field} 
+                    value={field.value || ''} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-
-        {matchType === 'live' && (
-          <FormField
-            control={form.control}
-            name="score"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Score</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. 2-1" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
@@ -195,7 +192,7 @@ const EditMatch: React.FC<EditMatchProps> = ({ match, onSave, matchType }) => {
           </Button>
         </div>
         
-        <div className="flex justify-end gap-2 pt-2">
+        <div className="flex justify-end gap-2">
           <Button type="submit" className="bg-sports-blue hover:bg-blue-700">
             Save Changes
           </Button>

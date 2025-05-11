@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   competition: z.string().min(1, "Competition is required"),
@@ -45,41 +47,55 @@ const CreateMatch = () => {
     },
   });
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     
-    // Get existing matches from localStorage
-    const existingLiveMatches = JSON.parse(localStorage.getItem('liveMatches') || '[]');
-    const existingUpcomingMatches = JSON.parse(localStorage.getItem('upcomingMatches') || '[]');
-    
-    const newMatch = {
-      id: Date.now(),
-      competition: data.competition,
-      homeTeam: data.homeTeam,
-      awayTeam: data.awayTeam,
-      date: data.date,
-      time: data.time,
-      slug: data.slug,
-      score: data.type === 'live' ? '0-0' : '',
-      links: 0
-    };
+    try {
+      // Create the match object for Supabase
+      const matchData = {
+        competition: data.competition,
+        home_team: data.homeTeam,
+        away_team: data.awayTeam || null, // Handle empty away team
+        date: data.date,
+        time: data.time,
+        slug: data.slug,
+        score: data.type === 'live' ? '0-0' : null,
+        type: data.type as 'live' | 'upcoming'
+      };
 
-    // Add match to the appropriate list
-    if (data.type === 'live') {
-      localStorage.setItem('liveMatches', JSON.stringify([...existingLiveMatches, newMatch]));
-    } else {
-      localStorage.setItem('upcomingMatches', JSON.stringify([...existingUpcomingMatches, newMatch]));
+      // Insert the match into Supabase
+      const { error } = await supabase
+        .from('matches')
+        .insert(matchData);
+
+      if (error) {
+        console.error('Error creating match:', error);
+        toast({
+          title: "Error",
+          description: `Failed to create match: ${error.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Show success message
+      toast({
+        title: "Match Created",
+        description: `${data.homeTeam} vs ${data.awayTeam} has been created successfully.`,
+      });
+
+      // Reset form
+      form.reset();
+    } catch (err) {
+      console.error('Error creating match:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Show success message
-    toast({
-      title: "Match Created",
-      description: `${data.homeTeam} vs ${data.awayTeam} has been created successfully.`,
-    });
-
-    // Reset form
-    form.reset();
-    setIsSubmitting(false);
   };
 
   const generateSlug = () => {
