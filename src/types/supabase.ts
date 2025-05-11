@@ -3,12 +3,12 @@ export interface Match {
   id: number;
   created_at: string;
   competition: string;
-  homeTeam: string;
-  awayTeam: string;
+  home_team: string;
+  away_team: string | null;
   date: string;
   time: string;
   slug: string;
-  score?: string;
+  score: string | null;
   type: 'live' | 'upcoming';
 }
 
@@ -18,13 +18,13 @@ export interface Channel {
   name: string;
   logo: string;
   slug: string;
-  logoUrl?: string;
+  logo_url?: string;
 }
 
 export interface StreamLink {
   id: number;
   created_at: string;
-  matchId: number;
+  match_id: number;
   name: string;
   url: string;
   quality: string;
@@ -34,16 +34,16 @@ export interface StreamLink {
 export interface StreamSource {
   id: number;
   created_at: string;
-  matchId: number;
+  match_id: number;
   name: string;
-  embedCode: string;
+  embed_code: string;
   slug: string;
 }
 
 export interface ChannelStream {
   id: number;
   created_at: string;
-  channelId: number;
+  channel_id: number;
   name: string;
   language: string;
   quality: string;

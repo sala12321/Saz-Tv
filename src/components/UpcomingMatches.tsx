@@ -69,9 +69,9 @@ const UpcomingMatches = () => {
                 <div className="text-sm text-gray-400 mb-2">{event.competition}</div>
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <div className="text-lg font-semibold text-white">{event.homeTeam}</div>
-                    {event.awayTeam && (
-                      <div className="text-lg font-semibold text-white">vs {event.awayTeam}</div>
+                    <div className="text-lg font-semibold text-white">{event.home_team}</div>
+                    {event.away_team && (
+                      <div className="text-lg font-semibold text-white">vs {event.away_team}</div>
                     )}
                   </div>
                   <div className="text-sports-blue">

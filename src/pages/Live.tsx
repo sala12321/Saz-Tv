@@ -75,9 +75,9 @@ const Live = () => {
                 
                 <div className="flex justify-between items-center">
                   <div>
-                    <div className="text-lg font-semibold text-white">{match.homeTeam}</div>
-                    {match.awayTeam && (
-                      <div className="text-lg font-semibold text-white">{match.awayTeam}</div>
+                    <div className="text-lg font-semibold text-white">{match.home_team}</div>
+                    {match.away_team && (
+                      <div className="text-lg font-semibold text-white">{match.away_team}</div>
                     )}
                   </div>
                   

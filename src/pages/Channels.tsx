@@ -71,9 +71,9 @@ const Channels = () => {
                   key={channel.id}
                   className="bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition flex flex-col items-center text-center"
                 >
-                  {channel.logoUrl ? (
+                  {channel.logo_url ? (
                     <img 
-                      src={channel.logoUrl} 
+                      src={channel.logo_url} 
                       alt={`${channel.name} logo`} 
                       className="w-16 h-16 rounded-full object-cover mb-3" 
                     />

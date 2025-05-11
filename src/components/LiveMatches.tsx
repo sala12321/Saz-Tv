@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import type { Match } from '../types/supabase';
 
@@ -117,8 +116,8 @@ const LiveMatches = () => {
               
               <div className="mt-3 flex justify-between items-center">
                 <div>
-                  <div className="text-lg font-semibold text-white">{match.homeTeam}</div>
-                  <div className="text-lg font-semibold text-white">{match.awayTeam}</div>
+                  <div className="text-lg font-semibold text-white">{match.home_team}</div>
+                  <div className="text-lg font-semibold text-white">{match.away_team}</div>
                 </div>
                 
                 <Link

@@ -81,8 +81,8 @@ const TomorrowMatches = () => {
               
               <div className="mt-3 flex justify-between items-center">
                 <div>
-                  <div className="text-lg font-semibold text-white">{match.homeTeam}</div>
-                  <div className="text-lg font-semibold text-white">{match.awayTeam}</div>
+                  <div className="text-lg font-semibold text-white">{match.home_team}</div>
+                  <div className="text-lg font-semibold text-white">{match.away_team}</div>
                 </div>
                 
                 <Link
