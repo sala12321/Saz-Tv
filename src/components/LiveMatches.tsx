@@ -13,6 +13,7 @@ const LiveMatches = () => {
   useEffect(() => {
     async function fetchLiveMatches() {
       try {
+        console.log('Fetching live matches from Supabase...');
         const { data, error } = await supabase
           .from('matches')
           .select('*')
@@ -24,6 +25,7 @@ const LiveMatches = () => {
           return;
         }
         
+        console.log('Live matches data:', data);
         setMatches(data || []);
         setError(null);
       } catch (err) {

@@ -16,6 +16,7 @@ const TomorrowMatches = () => {
       const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
       
       try {
+        console.log('Fetching tomorrow matches from Supabase for date:', tomorrow);
         const { data, error } = await supabase
           .from('matches')
           .select('*')
@@ -28,6 +29,7 @@ const TomorrowMatches = () => {
           return;
         }
         
+        console.log('Tomorrow matches data:', data);
         setMatches(data || []);
         setError(null);
       } catch (err) {

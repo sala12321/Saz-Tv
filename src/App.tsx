@@ -20,6 +20,7 @@ import Dmca from "./pages/Dmca";
 import Contact from "./pages/Contact";
 import LocalStreamPage from "./pages/LocalStreamPage";
 import StreamSourcesList from "./pages/StreamSourcesList";
+import Live from "./pages/Live";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/dmca" element={<Dmca />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/live" element={<Live />} />
           <Route path="/stream-sources/:id" element={<StreamSourcesList />} />
           <Route path="/local-stream/:slug" element={<LocalStreamPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

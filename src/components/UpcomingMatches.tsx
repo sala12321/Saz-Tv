@@ -13,6 +13,7 @@ const UpcomingMatches = () => {
   useEffect(() => {
     async function fetchUpcomingMatches() {
       try {
+        console.log('Fetching upcoming matches from Supabase...');
         const { data, error } = await supabase
           .from('matches')
           .select('*')
@@ -25,6 +26,7 @@ const UpcomingMatches = () => {
           return;
         }
         
+        console.log('Upcoming matches data:', data);
         setUpcoming(data || []);
         setError(null);
       } catch (err) {
